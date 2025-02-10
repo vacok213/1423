@@ -1,0 +1,144 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id             String          @id @default(cuid())
+  name           String?
+  email          String          @unique
+  emailVerified  DateTime?
+  image          String?
+  accounts       Account[]
+  sessions       Session[]
+  comments       Comment[]       @relation("user")
+  writedComments Comment[]       @relation("writer")
+  Authenticator  Authenticator[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  parentId String?
+  parent   Comment?  @relation("userComment", fields: [parentId], references: [id], onDelete: Cascade)
+  childs   Comment[] @relation("userComment")
+  writerId String
+  writer   User      @relation("writer", fields: [writerId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User      @relation("user", fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+model Authenticator {
+  credentialID         String  @unique
+  userId               String
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, credentialID])
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  price       Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  materials        ProductMaterial[]
+  productionOrders ProductionOrder[]
+}
+
+model Material {
+  id        String   @id @default(cuid())
+  name      String
+  cost      Float
+  unit      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products ProductMaterial[]
+}
+
+model ProductMaterial {
+  id         String @id @default(cuid())
+  productId  String
+  materialId String
+  quantity   Float
+
+  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  material Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+}
+
+model Status {
+  id              String            @id @default(cuid())
+  name            String
+  ProductionOrder ProductionOrder[]
+}
+
+model ProductionOrder {
+  id        String   @id @default(cuid())
+  productId String
+  quantity  Int
+  status    Status   @relation(fields: [statusId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product  Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  statusId String
+}
