@@ -1,5 +1,7 @@
+import { ValidationErrors } from "@react-types/shared";
+
 export type TAction<T> = {
-  data: T | null;
-  error: string | null;
-  validationErrors?: Record<string, string> | null;
+  data?: T | null;
+  message?: string | null;
+  validationErrors?: ValidationErrors | null;
 };

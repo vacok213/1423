@@ -8,11 +8,9 @@ import { TAction } from "@/types/actions";
 import { redirect } from "next/navigation";
 import { createMaterial } from "@/actions/material";
 import { TMaterial } from "@/types/material";
+import { Form } from "@heroui/form";
 
-const initialState: TAction<TMaterial> = {
-  data: null,
-  error: null,
-};
+const initialState: TAction<TMaterial> = {};
 
 export default function CreateMaterial() {
   const [state, formAction, pending] = useActionState(
@@ -21,7 +19,7 @@ export default function CreateMaterial() {
   );
 
   useEffect(() => {
-    if (state.data) {
+    if (state.data && !state.message && !state.validationErrors) {
       redirect("/materials");
     }
   }, [state]);
@@ -29,11 +27,11 @@ export default function CreateMaterial() {
   return (
     <Card>
       <CardBody>
-        <form action={formAction} className="space-y-4">
+        <Form action={formAction}>
           <Input
             errorMessage={state.validationErrors?.name}
             isInvalid={!!state.validationErrors?.name}
-            isRequired
+            isDisabled={pending}
             name="name"
             label="Имя"
           />
@@ -41,12 +39,13 @@ export default function CreateMaterial() {
             errorMessage={state.validationErrors?.unit}
             isInvalid={!!state.validationErrors?.unit}
             name="unit"
+            isDisabled={pending}
             label="Единица"
           />
           <Input
             errorMessage={state.validationErrors?.cost}
             isInvalid={!!state.validationErrors?.cost}
-            isRequired
+            isDisabled={pending}
             name="cost"
             label="Цена за единицу"
             endContent={
@@ -59,7 +58,7 @@ export default function CreateMaterial() {
           <Button isLoading={pending} color="primary" type="submit">
             Создать
           </Button>
-        </form>
+        </Form>
       </CardBody>
     </Card>
   );

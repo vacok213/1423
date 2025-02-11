@@ -4,6 +4,26 @@ import { materialSchema } from "@/schemas/material";
 import { TAction } from "@/types/actions";
 import { TMaterial } from "@/types/material";
 import { prisma } from "@/utils/prisma";
+import { ValidationErrors } from "@react-types/shared";
+
+export async function getMaterial(id: string): Promise<TAction<TMaterial>> {
+  try {
+    const res = await prisma.material.findUniqueOrThrow({
+      where: {
+        id,
+      },
+    });
+
+    return {
+      data: res as TMaterial,
+    };
+  } catch (error) {
+    return {
+      message:
+        error instanceof Error ? error.message : "An unknown error occurred",
+    };
+  }
+}
 
 export async function getMaterials(
   take: number,
@@ -20,12 +40,15 @@ export async function getMaterials(
 
     return {
       data: res as [TMaterial[], number],
-      error: null,
+      message: null,
+      validationErrors: null,
     };
   } catch (error) {
     return {
       data: null,
-      error: error instanceof Error ? error.message : "Critical error",
+      message:
+        error instanceof Error ? error.message : "An unknown error occurred",
+      validationErrors: null,
     };
   }
 }
@@ -46,7 +69,8 @@ export async function createMaterial(
     });
 
     if (!validationResult.success) {
-      const validationErrors: Record<string, string> = {};
+      const validationErrors: ValidationErrors = {};
+
       validationResult.error.errors.forEach((err) => {
         const fieldName = err.path[0];
         validationErrors[fieldName] = err.message;
@@ -54,7 +78,7 @@ export async function createMaterial(
 
       return {
         data: null,
-        error: "Validation error",
+        message: "Validation error",
         validationErrors,
       };
     }
@@ -71,12 +95,87 @@ export async function createMaterial(
 
     return {
       data: res as TMaterial,
-      error: null,
+      message: null,
+      validationErrors: null,
     };
   } catch (error) {
     return {
       data: null,
-      error: error instanceof Error ? error.message : "Critical error",
+      message:
+        error instanceof Error ? error.message : "An unknown error occurred",
+      validationErrors: null,
+    };
+  }
+}
+
+export async function updateMaterial(
+  id: string,
+  state: TAction<TMaterial>,
+  formData: FormData,
+): Promise<TAction<TMaterial>> {
+  try {
+    const name = formData.get("name") as string;
+    const unit = formData.get("unit") as string;
+    const cost = parseFloat(formData.get("cost") as string);
+
+    const validationResult = materialSchema.safeParse({
+      name,
+      unit,
+      cost,
+    });
+
+    if (!validationResult.success) {
+      const validationErrors: ValidationErrors = {};
+
+      validationResult.error.errors.forEach((err) => {
+        const fieldName = err.path[0];
+        validationErrors[fieldName] = err.message;
+      });
+
+      return {
+        data: null,
+        message: "Validation error",
+        validationErrors,
+      };
+    }
+
+    const validatedData = validationResult.data;
+
+    const res = await prisma.material.update({
+      where: {
+        id,
+      },
+      data: {
+        name: validatedData.name,
+        unit: validatedData.unit,
+        cost: validatedData.cost,
+      },
+    });
+
+    return {
+      data: res as TMaterial,
+    };
+  } catch (error) {
+    return {
+      message:
+        error instanceof Error ? error.message : "An unknown error occurred",
+    };
+  }
+}
+
+export async function deleteMaterial(id: string): Promise<TAction<TMaterial>> {
+  try {
+    const materal = await prisma.material.delete({
+      where: { id },
+    });
+
+    return {
+      data: materal as TMaterial,
+    };
+  } catch (error) {
+    return {
+      message:
+        error instanceof Error ? error.message : "An unknown error occurred",
     };
   }
 }

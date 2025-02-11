@@ -1,26 +1,30 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
-import { createProduct } from "@/actions/product";
-import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/card";
 import { Input } from "@heroui/input";
-import { TProduct } from "@/types/product";
+import { Card, CardBody } from "@heroui/card";
+import { Form } from "@heroui/form";
+import { useActionState, useEffect } from "react";
 import { TAction } from "@/types/actions";
 import { redirect } from "next/navigation";
-import { Form } from "@heroui/form";
+import { Button } from "@heroui/button";
+import { TMaterial } from "@/types/material";
+import { updateMaterial } from "@/actions/material";
 
-const initialState: TAction<TProduct> = {};
+type TEditMaterialProps = {
+  material: TMaterial;
+};
 
-export default function CreateProduct() {
+const initialState: TAction<TMaterial> = {};
+
+export default function EditProduct({ material }: TEditMaterialProps) {
   const [state, formAction, pending] = useActionState(
-    createProduct,
+    updateMaterial.bind(null, material.id),
     initialState,
   );
 
   useEffect(() => {
     if (state.data && !state.message && !state.validationErrors) {
-      redirect("/products");
+      redirect("/materials");
     }
   }, [state]);
 
@@ -29,6 +33,7 @@ export default function CreateProduct() {
       <CardBody>
         <Form action={formAction}>
           <Input
+            defaultValue={material.name}
             errorMessage={state.validationErrors?.name}
             isInvalid={!!state.validationErrors?.name}
             isDisabled={pending}
@@ -36,18 +41,20 @@ export default function CreateProduct() {
             label="Имя"
           />
           <Input
-            name="description"
-            errorMessage={state.validationErrors?.description}
-            isInvalid={!!state.validationErrors?.description}
+            defaultValue={material.unit}
+            name="unit"
+            errorMessage={state.validationErrors?.unit}
+            isInvalid={!!state.validationErrors?.unit}
             isDisabled={pending}
             label="Описание"
           />
           <Input
-            errorMessage={state.validationErrors?.price}
-            isInvalid={!!state.validationErrors?.price}
+            defaultValue={material.cost.toString()}
+            errorMessage={state.validationErrors?.cost}
+            isInvalid={!!state.validationErrors?.cost}
             isDisabled={pending}
-            name="price"
-            label="Цена"
+            name="cost"
+            label="Цена за единицу"
             endContent={
               <div className="pointer-events-none flex items-center">
                 <span className="text-default-400 text-small">₽</span>
@@ -56,7 +63,7 @@ export default function CreateProduct() {
             type="number"
           />
           <Button isLoading={pending} color="primary" type="submit">
-            Создать
+            Обновить
           </Button>
         </Form>
       </CardBody>

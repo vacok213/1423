@@ -16,19 +16,13 @@ export default async function ProductsPage({
   const { page = 1, limit = 20 } = await searchParams;
   const pageToSkip = (page - 1) * limit;
 
-  const res = await getMaterials(limit, pageToSkip);
+  const { data, message } = await getMaterials(limit, pageToSkip);
 
-  if (!res.data || res.error) {
+  if (!data || message) {
     return notFound();
   }
 
-  const [materials, total] = res.data;
+  const [materials, total] = data;
 
-  return (
-    <Materials
-      materials={materials as TMaterial[]}
-      total={total}
-      limit={limit}
-    />
-  );
+  return <Materials materials={materials} total={total} limit={limit} />;
 }

@@ -16,13 +16,13 @@ export default async function ProductsPage({
   const { page = 1, limit = 20 } = await searchParams;
   const pageToSkip = (page - 1) * limit;
 
-  const res = await getProducts(limit, pageToSkip);
+  const { data, message } = await getProducts(limit, pageToSkip);
 
-  if (!res.data || res.error) {
+  if (!data || message) {
     return notFound();
   }
 
-  const [products, total] = res.data;
+  const [products, total] = data;
 
   return (
     <Products products={products as TProduct[]} total={total} limit={limit} />

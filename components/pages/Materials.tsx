@@ -4,6 +4,7 @@ import { Button } from "@heroui/button";
 import { Link } from "@heroui/link";
 import { TPaginate } from "@/types/paginate";
 import Material from "../entities/Material";
+import MaterialActions from "../entities/MaterialActions";
 
 type TMaterialsProps = TPaginate & {
   materials: TMaterial[];
@@ -22,7 +23,11 @@ export default function Materials({
         </Button>
       </div>
       {materials.map((material) => (
-        <Material key={material.id} material={material} />
+        <Material
+          key={material.id}
+          material={material}
+          actions={<MaterialActions material={material} />}
+        />
       ))}
       <Paginate total={total} limit={limit} />
     </div>
