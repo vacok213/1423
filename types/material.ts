@@ -1,4 +1,4 @@
-import { TProductMaterial } from "./product-material";
+import { TProductMaterial } from "./productMaterial";
 
 export type TMaterial = {
   id: string;

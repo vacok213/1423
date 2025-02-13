@@ -135,10 +135,10 @@ model ProductionOrder {
   id        String   @id @default(cuid())
   productId String
   quantity  Int
-  status    Status   @relation(fields: [statusId], references: [id])
+  statusId  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  product  Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  statusId String
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  status  Status  @relation(fields: [statusId], references: [id])
 }

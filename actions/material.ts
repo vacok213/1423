@@ -8,14 +8,14 @@ import { ValidationErrors } from "@react-types/shared";
 
 export async function getMaterial(id: string): Promise<TAction<TMaterial>> {
   try {
-    const res = await prisma.material.findUniqueOrThrow({
+    const material = await prisma.material.findUniqueOrThrow({
       where: {
         id,
       },
     });
 
     return {
-      data: res as TMaterial,
+      data: material,
     };
   } catch (error) {
     return {
@@ -40,15 +40,11 @@ export async function getMaterials(
 
     return {
       data: res as [TMaterial[], number],
-      message: null,
-      validationErrors: null,
     };
   } catch (error) {
     return {
-      data: null,
       message:
         error instanceof Error ? error.message : "An unknown error occurred",
-      validationErrors: null,
     };
   }
 }
@@ -85,7 +81,7 @@ export async function createMaterial(
 
     const validatedData = validationResult.data;
 
-    const res = await prisma.material.create({
+    const material = await prisma.material.create({
       data: {
         name: validatedData.name,
         unit: validatedData.unit,
@@ -94,16 +90,12 @@ export async function createMaterial(
     });
 
     return {
-      data: res as TMaterial,
-      message: null,
-      validationErrors: null,
+      data: material,
     };
   } catch (error) {
     return {
-      data: null,
       message:
         error instanceof Error ? error.message : "An unknown error occurred",
-      validationErrors: null,
     };
   }
 }
@@ -141,7 +133,7 @@ export async function updateMaterial(
 
     const validatedData = validationResult.data;
 
-    const res = await prisma.material.update({
+    const material = await prisma.material.update({
       where: {
         id,
       },
@@ -153,7 +145,7 @@ export async function updateMaterial(
     });
 
     return {
-      data: res as TMaterial,
+      data: material,
     };
   } catch (error) {
     return {
@@ -170,7 +162,7 @@ export async function deleteMaterial(id: string): Promise<TAction<TMaterial>> {
     });
 
     return {
-      data: materal as TMaterial,
+      data: materal,
     };
   } catch (error) {
     return {

@@ -1,6 +1,5 @@
 import { getMaterials } from "@/actions/material";
 import Materials from "@/components/pages/Materials";
-import { TMaterial } from "@/types/material";
 import { notFound } from "next/navigation";
 
 export const revalidate = 0;
@@ -9,14 +8,17 @@ export default async function ProductsPage({
   searchParams,
 }: {
   searchParams: Promise<{
-    page?: number;
-    limit?: number;
+    page?: string;
+    limit?: string;
   }>;
 }) {
-  const { page = 1, limit = 20 } = await searchParams;
-  const pageToSkip = (page - 1) * limit;
+  const { page = "1", limit = "20" } = await searchParams;
 
-  const { data, message } = await getMaterials(limit, pageToSkip);
+  const parsedPage = Number(page);
+  const parsedLimit = Number(limit);
+  const pageToSkip = (parsedPage - 1) * parsedLimit;
+
+  const { data, message } = await getMaterials(parsedLimit, pageToSkip);
 
   if (!data || message) {
     return notFound();
@@ -24,5 +26,5 @@ export default async function ProductsPage({
 
   const [materials, total] = data;
 
-  return <Materials materials={materials} total={total} limit={limit} />;
+  return <Materials materials={materials} total={total} limit={parsedLimit} />;
 }

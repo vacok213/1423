@@ -41,7 +41,7 @@ export default function EditProduct({ product }: TEditProductProps) {
             label="Имя"
           />
           <Input
-            defaultValue={product.description}
+            defaultValue={product.description ?? ""}
             name="description"
             errorMessage={state.validationErrors?.description}
             isInvalid={!!state.validationErrors?.description}

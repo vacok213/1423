@@ -6,12 +6,10 @@ import {
   DropdownMenu,
   DropdownItem,
 } from "@heroui/dropdown";
-import { TMaterial } from "@/types/material";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { Button } from "@heroui/button";
 import { TDropdownItem } from "@/types/dropdownItem";
 import { useActionState, useEffect } from "react";
-import { deleteMaterial } from "@/actions/material";
 import { TAction } from "@/types/actions";
 import {
   Modal,
@@ -24,47 +22,57 @@ import {
 import { redirect } from "next/navigation";
 import { Link } from "@heroui/link";
 import { Form } from "@heroui/form";
+import { TProductionOrder } from "@/types/productionOrder";
+import { deleteProductionOrder } from "@/actions/productionOrder";
 
-type TMaterialActionsProps = {
-  material: TMaterial;
+type TProductionOrderActionsProps = {
+  productionOrder: TProductionOrder;
 };
 
-const initialState: TAction<TMaterial> = {};
+const initialState: TAction<TProductionOrder> = {};
 
-export default function MaterialActions({ material }: TMaterialActionsProps) {
+export default function ProductionOrderActions({
+  productionOrder,
+}: TProductionOrderActionsProps) {
   const {
-    isOpen: isOpenDeleteMaterial,
-    onOpen: onOpenDeleteMaterial,
-    onOpenChange: onOpenChangeDeleteMaterial,
+    isOpen: isOpenDeleteProductionOrder,
+    onOpen: onOpenDeleteProductionOrder,
+    onOpenChange: onOpenChangeDeleteProductionOrder,
   } = useDisclosure();
 
-  const [deleteMaterialState, deleteMaterialFormAction, deleteMaterialPending] =
-    useActionState(deleteMaterial.bind(null, material.id), initialState);
+  const [
+    deleteProductionOrderState,
+    deleteProductionOrderFormAction,
+    deleteProductionOrderPending,
+  ] = useActionState(
+    deleteProductionOrder.bind(null, productionOrder.id),
+    initialState,
+  );
 
   const actions: TDropdownItem[] = [
     {
       key: "edit",
       children: "Изменить",
       as: Link,
-      href: `/materials/${material.id}/edit`,
+      href: `/production-orders/${productionOrder.id}/edit`,
     },
     {
       key: "delete",
       color: "danger",
       children: "Удалить",
-      onPress: onOpenDeleteMaterial,
+      onPress: onOpenDeleteProductionOrder,
     },
   ];
 
   useEffect(() => {
     if (
-      deleteMaterialState.data &&
-      !deleteMaterialState.message &&
-      !deleteMaterialState.validationErrors
+      deleteProductionOrderState.data &&
+      !deleteProductionOrderState.message &&
+      !deleteProductionOrderState.validationErrors
     ) {
-      redirect("/materials");
+      redirect("/production-orders");
     }
-  }, [deleteMaterialState]);
+  }, [deleteProductionOrderState]);
 
   return (
     <>
@@ -84,24 +92,24 @@ export default function MaterialActions({ material }: TMaterialActionsProps) {
       </Dropdown>
       <Modal
         backdrop="blur"
-        isOpen={isOpenDeleteMaterial}
-        onOpenChange={onOpenChangeDeleteMaterial}
+        isOpen={isOpenDeleteProductionOrder}
+        onOpenChange={onOpenChangeDeleteProductionOrder}
       >
         <ModalContent>
           <>
             <ModalHeader className="flex flex-col gap-1">
-              Вы уверены, что хотите удалить данный материал?
+              Вы уверены, что хотите удалить данный производственный заказ?
             </ModalHeader>
             <ModalBody>
-              Это действие необратимо, продукт будет полностью удален из базы
-              данных!
+              Это действие необратимо, производственный заказ будет полностью
+              удален из базы данных!
             </ModalBody>
             <ModalFooter>
-              <Form action={deleteMaterialFormAction}>
+              <Form action={deleteProductionOrderFormAction}>
                 <Button
                   type="submit"
                   color="danger"
-                  isLoading={deleteMaterialPending}
+                  isLoading={deleteProductionOrderPending}
                 >
                   Удалить
                 </Button>

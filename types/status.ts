@@ -1,4 +1,4 @@
-import { TProductionOrder } from "./production-order";
+import { TProductionOrder } from "./productionOrder";
 
 export type TStatus = {
   id: string;

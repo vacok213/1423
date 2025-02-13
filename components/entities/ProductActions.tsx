@@ -9,7 +9,7 @@ import {
 import { TProduct } from "@/types/product";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { Button } from "@heroui/button";
-import { TDropdownItem } from "@/types/dropdown-item";
+import { TDropdownItem } from "@/types/dropdownItem";
 import { useActionState, useEffect } from "react";
 import { deleteProduct } from "@/actions/product";
 import { TAction } from "@/types/actions";
@@ -21,7 +21,7 @@ import {
   useDisclosure,
   ModalBody,
 } from "@heroui/modal";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import { Link } from "@heroui/link";
 import { Form } from "@heroui/form";
 
@@ -29,15 +29,9 @@ type TProductActionsProps = {
   product: TProduct;
 };
 
-const initialState: TAction<TProduct> = {
-  data: null,
-  message: null,
-  validationErrors: null,
-};
+const initialState: TAction<TProduct> = {};
 
 export default function ProductActions({ product }: TProductActionsProps) {
-  const router = useRouter();
-
   const {
     isOpen: isOpenDeleteProduct,
     onOpen: onOpenDeleteProduct,
@@ -68,7 +62,7 @@ export default function ProductActions({ product }: TProductActionsProps) {
       !deleteProductState.message &&
       !deleteProductState.validationErrors
     ) {
-      router.refresh();
+      redirect("/products");
     }
   }, [deleteProductState]);
 
@@ -104,7 +98,6 @@ export default function ProductActions({ product }: TProductActionsProps) {
             </ModalBody>
             <ModalFooter>
               <Form action={deleteProductFormAction}>
-                <input type="hidden" name="id" value={product.id} />
                 <Button
                   type="submit"
                   color="danger"

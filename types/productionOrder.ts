@@ -8,6 +8,6 @@ export type TProductionOrder = {
   statusId: string;
   createdAt: Date;
   updatedAt: Date;
-  product: TProduct;
-  status: TStatus;
+  product?: TProduct;
+  status?: TStatus;
 };

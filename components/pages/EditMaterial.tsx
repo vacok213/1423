@@ -46,7 +46,7 @@ export default function EditProduct({ material }: TEditMaterialProps) {
             errorMessage={state.validationErrors?.unit}
             isInvalid={!!state.validationErrors?.unit}
             isDisabled={pending}
-            label="Описание"
+            label="Единица"
           />
           <Input
             defaultValue={material.cost.toString()}

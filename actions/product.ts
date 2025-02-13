@@ -8,14 +8,14 @@ import { ValidationErrors } from "@react-types/shared";
 
 export async function getProduct(id: string): Promise<TAction<TProduct>> {
   try {
-    const res = await prisma.product.findUniqueOrThrow({
+    const product = await prisma.product.findUniqueOrThrow({
       where: {
         id,
       },
     });
 
     return {
-      data: res as TProduct,
+      data: product,
     };
   } catch (error) {
     return {
@@ -39,7 +39,7 @@ export async function getProducts(
     ]);
 
     return {
-      data: res as [TProduct[], number],
+      data: res,
     };
   } catch (error) {
     return {
@@ -80,7 +80,7 @@ export async function createProduct(
 
     const validatedData = validationResult.data;
 
-    const res = await prisma.product.create({
+    const product = await prisma.product.create({
       data: {
         name: validatedData.name,
         description: validatedData.description,
@@ -89,7 +89,7 @@ export async function createProduct(
     });
 
     return {
-      data: res as TProduct,
+      data: product,
     };
   } catch (error) {
     return {
@@ -131,7 +131,7 @@ export async function updateProduct(
 
     const validatedData = validationResult.data;
 
-    const res = await prisma.product.update({
+    const product = await prisma.product.update({
       where: {
         id,
       },
@@ -143,7 +143,7 @@ export async function updateProduct(
     });
 
     return {
-      data: res as TProduct,
+      data: product,
     };
   } catch (error) {
     return {
@@ -160,7 +160,7 @@ export async function deleteProduct(id: string): Promise<TAction<TProduct>> {
     });
 
     return {
-      data: product as TProduct,
+      data: product,
     };
   } catch (error) {
     return {
