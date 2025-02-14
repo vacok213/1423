@@ -1,59 +1,93 @@
 import { TProductionOrder } from "@/types/productionOrder";
 import formatPrice from "@/utils/formatPrice";
 import { Card, CardBody } from "@heroui/card";
-import { Chip } from "@heroui/chip";
+import { FaCaretUp, FaCaretDown } from "react-icons/fa";
+import { formatDistance } from "date-fns";
+import { ru } from "date-fns/locale";
 
 type ProductionOrderProps = {
   productionOrder: TProductionOrder;
-  costEstimateProductionOrder: number;
+  costEstimateProduct: number;
   actions?: React.ReactNode;
 };
 
 export default function ProductionOrder({
   productionOrder,
-  costEstimateProductionOrder,
+  costEstimateProduct,
   actions,
 }: ProductionOrderProps) {
   const productPrice = productionOrder.product?.price ?? 0;
+  const costEstimateProductionOrder =
+    costEstimateProduct * productionOrder.quantity;
   const profit =
     productPrice * productionOrder.quantity - costEstimateProductionOrder;
 
   return (
-    <Card>
-      <CardBody>
-        <div className="space-y-4">
-          <div className="flex justify-between gap-4">
-            <div className="flex items-center flex-wrap gap-2">
-              {productionOrder.status && (
-                <Chip>
-                  Статус:{" "}
-                  <span className="font-bold">
-                    {productionOrder.status?.name}
-                  </span>
-                </Chip>
-              )}
-              <Chip color="primary">
-                Колличество:{" "}
-                <span className="font-bold">{productionOrder.quantity}</span>
-              </Chip>
+    <div className="space-y-4">
+      <Card>
+        <CardBody>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between gap-4">
               {productionOrder.product && (
-                <p className="font-bold">{productionOrder.product.name}</p>
+                <h2 className="text-xl font-bold">
+                  {productionOrder.product.name}
+                </h2>
               )}
+              {actions}
             </div>
-            {actions}
           </div>
-          <p>
-            Оценка себестоимости производственного заказа:{" "}
-            <span className="font-bold">
+        </CardBody>
+      </Card>
+      <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-2">
+        {productionOrder.status && (
+          <Card>
+            <CardBody>
+              <p>Статус:</p>
+              <h2 className="text-xl font-bold">
+                {productionOrder.status.name}
+              </h2>
+            </CardBody>
+          </Card>
+        )}
+        <Card>
+          <CardBody>
+            <p>Колличество:</p>
+            <h2 className="text-xl font-bold">{productionOrder.quantity}</h2>
+          </CardBody>
+        </Card>
+        <Card>
+          <CardBody>
+            <p>Дата создания:</p>
+            <h2 className="text-xl font-bold">
+              {formatDistance(new Date(productionOrder.createdAt), new Date(), {
+                locale: ru,
+                addSuffix: true,
+              })}
+            </h2>
+          </CardBody>
+        </Card>
+        <Card>
+          <CardBody>
+            <p>Оценка себестоимости:</p>
+            <h2 className="text-xl font-bold">
               {formatPrice(costEstimateProductionOrder)}
-            </span>
-          </p>
-          <p>
-            Чистая прибыль исходя из стоимости продукта составляет:{" "}
-            <span className="font-bold">{formatPrice(profit)}</span>
-          </p>
-        </div>
-      </CardBody>
-    </Card>
+            </h2>
+          </CardBody>
+        </Card>
+        <Card>
+          <CardBody>
+            <p>Чистая прибыль:</p>
+            <div className="flex flex-wrap gap-2 items-center">
+              {profit > 0 ? (
+                <FaCaretUp size={22} className="text-green-500" />
+              ) : (
+                <FaCaretDown size={22} className="text-red-500" />
+              )}
+              <h2 className="text-xl font-bold">{formatPrice(profit)}</h2>
+            </div>
+          </CardBody>
+        </Card>
+      </div>
+    </div>
   );
 }

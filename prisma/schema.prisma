@@ -7,20 +7,26 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum Role {
+  MANAGER
+  ADMIN
+}
+
 model User {
-  id             String          @id @default(cuid())
-  name           String?
-  email          String          @unique
-  emailVerified  DateTime?
-  image          String?
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  role          Role      @default(MANAGER)
+
   accounts       Account[]
   sessions       Session[]
   comments       Comment[]       @relation("user")
   writedComments Comment[]       @relation("writer")
   Authenticator  Authenticator[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model Comment {

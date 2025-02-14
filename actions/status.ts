@@ -3,8 +3,8 @@ import { TStatus } from "@/types/status";
 import { prisma } from "@/utils/prisma";
 
 export async function getStatuses(
-  take: number,
-  skip: number,
+  take?: number,
+  skip?: number,
 ): Promise<TAction<[TStatus[], number]>> {
   try {
     const res = await prisma.$transaction([

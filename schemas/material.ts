@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/ru-zod";
 
 export const materialSchema = z.object({
   name: z.string().min(2),

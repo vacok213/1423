@@ -1,9 +1,16 @@
 import { getProducts } from "@/actions/product";
 import { getMaterials } from "@/actions/material";
 import CreateProductMaterial from "@/components/pages/CreateProductMaterial";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { auth } from "@/auth";
 
 export default async function CreateProductMaterialPage() {
+  const session = await auth();
+
+  if (session?.user.role !== "ADMIN") {
+    redirect("/");
+  }
+
   const { data: productsData, message: productsMessage } = await getProducts(
     9999999999999,
     0,

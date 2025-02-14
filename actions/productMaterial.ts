@@ -7,12 +7,39 @@ import { ValidationErrors } from "@react-types/shared";
 import { productMaterialSchema } from "@/schemas/productMaterial";
 
 export async function getProductMaterials(
-  take: number,
-  skip: number,
+  take?: number,
+  skip?: number,
+  productId?: string,
+  materialId?: string,
 ): Promise<TAction<[TProductMaterial[], number]>> {
   try {
+    const decodedProductId = productId
+      ? decodeURIComponent(productId)
+      : undefined;
+    const decodedMaterialId = materialId
+      ? decodeURIComponent(materialId)
+      : undefined;
+
     const res = await prisma.$transaction([
       prisma.productMaterial.findMany({
+        where: {
+          AND: [
+            {
+              OR: [
+                {
+                  productId: {
+                    contains: decodedProductId,
+                    mode: "insensitive",
+                  },
+                  materialId: {
+                    contains: decodedMaterialId,
+                    mode: "insensitive",
+                  },
+                },
+              ],
+            },
+          ],
+        },
         take,
         skip,
         include: {
@@ -20,7 +47,26 @@ export async function getProductMaterials(
           material: true,
         },
       }),
-      prisma.productMaterial.count(),
+      prisma.productMaterial.count({
+        where: {
+          AND: [
+            {
+              OR: [
+                {
+                  productId: {
+                    contains: decodedProductId,
+                    mode: "insensitive",
+                  },
+                  materialId: {
+                    contains: decodedMaterialId,
+                    mode: "insensitive",
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      }),
     ]);
 
     return {

@@ -135,44 +135,38 @@ export async function updateProductionOrder(
   }
 }
 
-export async function getCostEstimateProductionOrder(
-  id: string,
-): Promise<TAction<number>> {
-  try {
-    const productMaterials = await prisma.productMaterial.findMany({
-      where: {
-        productId: id,
-      },
-      include: {
-        material: true,
-      },
-    });
-
-    let costEstimateProductionOrder = 0;
-
-    productMaterials.forEach((productMaterial) => {
-      costEstimateProductionOrder +=
-        productMaterial.material.cost * productMaterial.quantity;
-    });
-
-    return {
-      data: costEstimateProductionOrder,
-    };
-  } catch (error) {
-    return {
-      message:
-        error instanceof Error ? error.message : "An unknown error occurred",
-    };
-  }
-}
-
 export async function getProductionOrders(
-  take: number,
-  skip: number,
+  take?: number,
+  skip?: number,
+  productId?: string,
+  statusId?: string,
 ): Promise<TAction<[TProductionOrder[], number]>> {
   try {
+    const decodedProductId = productId
+      ? decodeURIComponent(productId)
+      : undefined;
+    const decodedStatusId = statusId ? decodeURIComponent(statusId) : undefined;
+
     const res = await prisma.$transaction([
       prisma.productionOrder.findMany({
+        where: {
+          AND: [
+            {
+              OR: [
+                {
+                  productId: {
+                    contains: decodedProductId,
+                    mode: "insensitive",
+                  },
+                  statusId: {
+                    contains: decodedStatusId,
+                    mode: "insensitive",
+                  },
+                },
+              ],
+            },
+          ],
+        },
         include: {
           product: true,
           status: true,
@@ -180,7 +174,26 @@ export async function getProductionOrders(
         take,
         skip,
       }),
-      prisma.productionOrder.count(),
+      prisma.productionOrder.count({
+        where: {
+          AND: [
+            {
+              OR: [
+                {
+                  productId: {
+                    contains: decodedProductId,
+                    mode: "insensitive",
+                  },
+                  statusId: {
+                    contains: decodedStatusId,
+                    mode: "insensitive",
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      }),
     ]);
 
     return {

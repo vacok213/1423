@@ -1,3 +1,5 @@
+import { TRole } from "./role";
+
 export type TUser = {
   id: string;
   name?: string;
@@ -6,4 +8,5 @@ export type TUser = {
   image?: string;
   createdAt: string;
   updatedAt: string;
+  role: TRole;
 };

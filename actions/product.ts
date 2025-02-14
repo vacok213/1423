@@ -26,16 +26,60 @@ export async function getProduct(id: string): Promise<TAction<TProduct>> {
 }
 
 export async function getProducts(
-  take: number,
-  skip: number,
+  take?: number,
+  skip?: number,
+  query?: string,
 ): Promise<TAction<[TProduct[], number]>> {
   try {
+    const decodedQuery = query ? decodeURIComponent(query) : undefined;
+
     const res = await prisma.$transaction([
       prisma.product.findMany({
+        where: {
+          AND: [
+            {
+              OR: [
+                {
+                  name: {
+                    contains: decodedQuery,
+                    mode: "insensitive",
+                  },
+                },
+                {
+                  description: {
+                    contains: decodedQuery,
+                    mode: "insensitive",
+                  },
+                },
+              ],
+            },
+          ],
+        },
         take,
         skip,
       }),
-      prisma.product.count(),
+      prisma.product.count({
+        where: {
+          AND: [
+            {
+              OR: [
+                {
+                  name: {
+                    contains: query,
+                    mode: "insensitive",
+                  },
+                },
+                {
+                  description: {
+                    contains: query,
+                    mode: "insensitive",
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      }),
     ]);
 
     return {
@@ -161,6 +205,37 @@ export async function deleteProduct(id: string): Promise<TAction<TProduct>> {
 
     return {
       data: product,
+    };
+  } catch (error) {
+    return {
+      message:
+        error instanceof Error ? error.message : "An unknown error occurred",
+    };
+  }
+}
+
+export async function getCostEstimateProduct(
+  id: string,
+): Promise<TAction<number>> {
+  try {
+    const productMaterials = await prisma.productMaterial.findMany({
+      where: {
+        productId: id,
+      },
+      include: {
+        material: true,
+      },
+    });
+
+    let costEstimateProduct = 0;
+
+    productMaterials.forEach((productMaterial) => {
+      costEstimateProduct +=
+        productMaterial.material.cost * productMaterial.quantity;
+    });
+
+    return {
+      data: costEstimateProduct,
     };
   } catch (error) {
     return {

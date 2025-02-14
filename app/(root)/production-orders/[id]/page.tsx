@@ -1,16 +1,24 @@
-import {
-  getCostEstimateProductionOrder,
-  getProductionOrder,
-} from "@/actions/productionOrder";
+import { getCostEstimateProduct } from "@/actions/product";
+import { getProductionOrder } from "@/actions/productionOrder";
+import { auth } from "@/auth";
 import ProductionOrderActions from "@/components/entities/ProductionOrderActions";
 import ProductionOrder from "@/components/pages/ProductionOrder";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 export default async function ProductionOrderPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const session = await auth();
+
+  const isAdmin = session?.user.role === "ADMIN";
+  const isManager = session?.user.role === "MANAGER";
+
+  if (!isAdmin && !isManager) {
+    redirect("/");
+  }
+
   const { id } = await params;
 
   const { data: productionOrder, message: productionOrderMessage } =
@@ -20,22 +28,17 @@ export default async function ProductionOrderPage({
     return notFound();
   }
 
-  const {
-    data: costEstimateProductionOrder,
-    message: costEstimateProductionOrderMessage,
-  } = await getCostEstimateProductionOrder(productionOrder.productId);
+  const { data: costEstimateProduct, message: costEstimateProductMessage } =
+    await getCostEstimateProduct(productionOrder.productId);
 
-  if (
-    costEstimateProductionOrder == null ||
-    costEstimateProductionOrderMessage
-  ) {
+  if (costEstimateProduct == null || costEstimateProductMessage) {
     return notFound();
   }
 
   return (
     <ProductionOrder
       productionOrder={productionOrder}
-      costEstimateProductionOrder={costEstimateProductionOrder}
+      costEstimateProduct={costEstimateProduct}
       actions={<ProductionOrderActions productionOrder={productionOrder} />}
     />
   );

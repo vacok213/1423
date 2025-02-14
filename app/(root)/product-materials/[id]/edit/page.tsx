@@ -1,19 +1,26 @@
 import { getProductMaterial } from "@/actions/productMaterial";
 import { getProducts } from "@/actions/product";
 import { getMaterials } from "@/actions/material";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import EditProductMaterial from "@/components/pages/EditProductMaterial";
+import { auth } from "@/auth";
 
 export default async function EditProductMaterialPage({
   params,
 }: {
   params: { id: string };
 }) {
+  const session = await auth();
+
+  if (session?.user.role !== "ADMIN") {
+    redirect("/");
+  }
+
   const { id } = params;
 
   const productMaterialReq = getProductMaterial(id);
-  const productsReq = getProducts(9999999999999, 0);
-  const materialsReq = getMaterials(9999999999999, 0);
+  const productsReq = getProducts();
+  const materialsReq = getMaterials();
 
   const [productMaterialResponse, productsRes, materialsRes] =
     await Promise.all([productMaterialReq, productsReq, materialsReq]);

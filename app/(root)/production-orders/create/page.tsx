@@ -1,15 +1,22 @@
 import CreateProductionOrder from "@/components/pages/CreateProductionOrder";
 import { getProducts } from "@/actions/product";
 import { getStatuses } from "@/actions/status";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { auth } from "@/auth";
 
 export default async function CreateProductionOrderPage() {
-  const productsReq = getProducts(9999999999999, 0);
-  const statusesReq = getStatuses(9999999999999, 0);
+  const session = await auth();
+
+  const isAdmin = session?.user.role === "ADMIN";
+  const isManager = session?.user.role === "MANAGER";
+
+  if (!isAdmin && !isManager) {
+    redirect("/");
+  }
 
   const [productsRes, statusesRes] = await Promise.all([
-    productsReq,
-    statusesReq,
+    getProducts(),
+    getStatuses(),
   ]);
 
   const { data: productsData, message: productsMessage } = productsRes;

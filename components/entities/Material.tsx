@@ -14,8 +14,9 @@ export default function Material({ material, actions }: TMaterialProps) {
         <div className="flex justify-between gap-4">
           <div>
             <h2 className="font-bold text-lg">{material.name}</h2>
-            <p className="font-bold">
-              {formatPrice(material.cost)} за {material.unit}
+            <p>
+              <span className="font-bold">{formatPrice(material.cost)}</span> за{" "}
+              <span className="font-bold">{material.unit}</span>
             </p>
           </div>
           {actions}

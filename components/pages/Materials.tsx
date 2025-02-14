@@ -5,6 +5,8 @@ import { Link } from "@heroui/link";
 import { TPaginate } from "@/types/paginate";
 import Material from "../entities/Material";
 import MaterialActions from "../entities/MaterialActions";
+import { Card, CardBody } from "@heroui/card";
+import Search from "../widgets/Search";
 
 type TMaterialsProps = TPaginate & {
   materials: TMaterial[];
@@ -17,6 +19,13 @@ export default function Materials({
 }: TMaterialsProps) {
   return (
     <div className="space-y-4">
+      <Card isBlurred className="sticky top-40 z-30">
+        <CardBody>
+          <div className="space-y-4">
+            <Search param="query" label="Поиск" />
+          </div>
+        </CardBody>
+      </Card>
       <div className="flex justify-end">
         <Button color="primary" as={Link} href="/materials/create">
           Создать

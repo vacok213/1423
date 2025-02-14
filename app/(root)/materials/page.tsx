@@ -1,6 +1,7 @@
 import { getMaterials } from "@/actions/material";
+import { auth } from "@/auth";
 import Materials from "@/components/pages/Materials";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 export const revalidate = 0;
 
@@ -10,15 +11,22 @@ export default async function ProductsPage({
   searchParams: Promise<{
     page?: string;
     limit?: string;
+    query?: string;
   }>;
 }) {
-  const { page = "1", limit = "20" } = await searchParams;
+  const session = await auth();
+
+  if (session?.user.role !== "ADMIN") {
+    redirect("/");
+  }
+
+  const { page = "1", limit = "20", query = "" } = await searchParams;
 
   const parsedPage = Number(page);
   const parsedLimit = Number(limit);
   const pageToSkip = (parsedPage - 1) * parsedLimit;
 
-  const { data, message } = await getMaterials(parsedLimit, pageToSkip);
+  const { data, message } = await getMaterials(parsedLimit, pageToSkip, query);
 
   if (!data || message) {
     return notFound();

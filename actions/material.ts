@@ -26,16 +26,48 @@ export async function getMaterial(id: string): Promise<TAction<TMaterial>> {
 }
 
 export async function getMaterials(
-  take: number,
-  skip: number,
+  take?: number,
+  skip?: number,
+  query?: string,
 ): Promise<TAction<[TMaterial[], number]>> {
   try {
+    const decodedQuery = query ? decodeURIComponent(query) : undefined;
+
     const res = await prisma.$transaction([
       prisma.material.findMany({
+        where: {
+          AND: [
+            {
+              OR: [
+                {
+                  name: {
+                    contains: decodedQuery,
+                    mode: "insensitive",
+                  },
+                },
+              ],
+            },
+          ],
+        },
         take,
         skip,
       }),
-      prisma.material.count(),
+      prisma.material.count({
+        where: {
+          AND: [
+            {
+              OR: [
+                {
+                  name: {
+                    contains: decodedQuery,
+                    mode: "insensitive",
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      }),
     ]);
 
     return {
