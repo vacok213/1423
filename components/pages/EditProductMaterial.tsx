@@ -48,12 +48,13 @@ export default function EditProductMaterial({
             isInvalid={!!state.validationErrors?.productId}
             name="productId"
             label="Продукт"
+            items={products}
           >
-            {products.map((product) => (
+            {(product) => (
               <SelectItem key={product.id} id={product.id}>
                 {product.name}
               </SelectItem>
-            ))}
+            )}
           </Select>
           <Select
             isVirtualized
@@ -62,12 +63,13 @@ export default function EditProductMaterial({
             isInvalid={!!state.validationErrors?.materialId}
             name="materialId"
             label="Материал"
+            items={materials}
           >
-            {materials.map((material) => (
+            {(material) => (
               <SelectItem key={material.id} id={material.id}>
                 {material.name}
               </SelectItem>
-            ))}
+            )}
           </Select>
           <Input
             defaultValue={productMaterial.quantity.toString()}

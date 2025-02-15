@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE "Material" ALTER COLUMN "quantityInStock" SET DEFAULT 0,
+ALTER COLUMN "quantityInStock" SET DATA TYPE DOUBLE PRECISION;
+
+-- AlterTable
+ALTER TABLE "MaterialOrder" ALTER COLUMN "quantity" SET DATA TYPE DOUBLE PRECISION;

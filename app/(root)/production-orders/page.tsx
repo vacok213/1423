@@ -1,10 +1,11 @@
 import { getProductionOrders } from "@/actions/productionOrder";
 import { getProducts } from "@/actions/product";
 import { getStatuses } from "@/actions/status";
-import { getProductionOrdersCountByMonth } from "@/actions/productionOrder";
+import { getProductionOrdersCountInRange } from "@/actions/productionOrder"; // Обновленный метод
 import { auth } from "@/auth";
 import ProductionOrders from "@/components/pages/ProductionOrders";
 import { notFound, redirect } from "next/navigation";
+import { startOfMonth, endOfMonth, subMonths } from "date-fns";
 
 export default async function ProductionOrdersPage({
   searchParams,
@@ -36,10 +37,13 @@ export default async function ProductionOrdersPage({
   const parsedLimit = Number(limit);
   const pageToSkip = (parsedPage - 1) * parsedLimit;
 
-  const date = new Date();
-  const currentMonth = date.getMonth() + 1;
-  const currentYear = date.getFullYear();
-  const previousMonth = currentMonth - 1;
+  const currentDate = new Date();
+
+  const startOfCurrentMonth = startOfMonth(currentDate);
+  const endOfCurrentMonth = endOfMonth(currentDate);
+
+  const startOfPreviousMonth = startOfMonth(subMonths(currentDate, 1));
+  const endOfPreviousMonth = endOfMonth(subMonths(currentDate, 1));
 
   const [
     productionOrdersResponse,
@@ -51,8 +55,8 @@ export default async function ProductionOrdersPage({
     getProductionOrders(parsedLimit, pageToSkip, productId, statusId),
     getProducts(),
     getStatuses(),
-    getProductionOrdersCountByMonth(currentYear, currentMonth),
-    getProductionOrdersCountByMonth(currentYear, previousMonth),
+    getProductionOrdersCountInRange(startOfCurrentMonth, endOfCurrentMonth),
+    getProductionOrdersCountInRange(startOfPreviousMonth, endOfPreviousMonth),
   ]);
 
   const { data: productionOrdersData, message: productionOrdersMessage } =

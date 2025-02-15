@@ -5,6 +5,9 @@ import { TAction } from "@/types/actions";
 import { TProductionOrder } from "@/types/productionOrder";
 import { prisma } from "@/utils/prisma";
 import { ValidationErrors } from "@react-types/shared";
+import { getRequiredMaterialsForProduction } from "./product";
+import { TInsufficientMaterials } from "@/types/insufficientMaterial";
+import { TMaterialOrder } from "@/types/materialOrder";
 
 export async function getProductionOrder(
   id: string,
@@ -32,12 +35,12 @@ export async function getProductionOrder(
 }
 
 export async function createProductionOrder(
-  state: TAction<TProductionOrder>,
+  state: TAction<[TInsufficientMaterials[], TProductionOrder?]>,
   formData: FormData,
-): Promise<TAction<TProductionOrder>> {
+): Promise<TAction<[TInsufficientMaterials[], TProductionOrder?]>> {
   try {
     const productId = formData.get("productId") as string;
-    const quantity = parseInt(formData.get("quantity") as string);
+    const quantity = parseFloat(formData.get("quantity") as string);
     const statusId = formData.get("statusId") as string;
 
     const validationResult = productionOrderSchema.safeParse({
@@ -62,7 +65,28 @@ export async function createProductionOrder(
 
     const validatedData = validationResult.data;
 
-    const product = await prisma.productionOrder.create({
+    const { data, message: materialsMessage } =
+      await getRequiredMaterialsForProduction(
+        validatedData.productId,
+        validatedData.quantity,
+      );
+
+    if (!data || materialsMessage) {
+      return {
+        message: materialsMessage,
+      };
+    }
+
+    const insufficientMaterials = data.insufficientMaterials;
+
+    if (insufficientMaterials.length > 0) {
+      return {
+        data: [insufficientMaterials],
+        message: "Not enough materials",
+      };
+    }
+
+    const productionOrder = await prisma.productionOrder.create({
       data: {
         productId: validatedData.productId,
         quantity: validatedData.quantity,
@@ -71,7 +95,7 @@ export async function createProductionOrder(
     });
 
     return {
-      data: product,
+      data: [insufficientMaterials, productionOrder],
     };
   } catch (error) {
     return {
@@ -88,7 +112,7 @@ export async function updateProductionOrder(
 ): Promise<TAction<TProductionOrder>> {
   try {
     const productId = formData.get("productId") as string;
-    const quantity = parseInt(formData.get("quantity") as string);
+    const quantity = parseFloat(formData.get("quantity") as string);
     const statusId = formData.get("statusId") as string;
 
     const validationResult = productionOrderSchema.safeParse({
@@ -226,16 +250,16 @@ export async function deleteProductionOrder(
   }
 }
 
-export async function getProductionOrdersCountByMonth(
-  year: number,
-  month: number,
+export async function getProductionOrdersCountInRange(
+  startDate: Date,
+  endDate: Date,
 ): Promise<TAction<number>> {
   try {
     const count = await prisma.productionOrder.count({
       where: {
         createdAt: {
-          gte: new Date(year, month - 1, 1),
-          lt: new Date(year, month, 1),
+          gte: startDate,
+          lt: endDate,
         },
       },
     });

@@ -89,11 +89,15 @@ export async function createMaterial(
     const name = formData.get("name") as string;
     const unit = formData.get("unit") as string;
     const cost = parseFloat(formData.get("cost") as string);
+    const quantityInStock = parseFloat(
+      formData.get("quantityInStock") as string,
+    );
 
     const validationResult = materialSchema.safeParse({
       name,
       unit,
       cost,
+      quantityInStock,
     });
 
     if (!validationResult.success) {
@@ -118,6 +122,7 @@ export async function createMaterial(
         name: validatedData.name,
         unit: validatedData.unit,
         cost: validatedData.cost,
+        quantityInStock: validatedData.quantityInStock,
       },
     });
 
@@ -141,11 +146,15 @@ export async function updateMaterial(
     const name = formData.get("name") as string;
     const unit = formData.get("unit") as string;
     const cost = parseFloat(formData.get("cost") as string);
+    const quantityInStock = parseFloat(
+      formData.get("quantityInStock") as string,
+    );
 
     const validationResult = materialSchema.safeParse({
       name,
       unit,
       cost,
+      quantityInStock,
     });
 
     if (!validationResult.success) {
@@ -173,6 +182,7 @@ export async function updateMaterial(
         name: validatedData.name,
         unit: validatedData.unit,
         cost: validatedData.cost,
+        quantityInStock: validatedData.quantityInStock,
       },
     });
 

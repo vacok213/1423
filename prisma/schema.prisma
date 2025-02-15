@@ -94,14 +94,27 @@ model Product {
 }
 
 model Material {
-  id        String   @id @default(cuid())
-  name      String
-  cost      Float
-  unit      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String   @id @default(cuid())
+  name            String
+  cost            Float
+  unit            String
+  quantityInStock Float    @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
-  products ProductMaterial[]
+  products       ProductMaterial[]
+  materialOrders MaterialOrder[]
+}
+
+model MaterialOrder {
+  id          String    @id @default(cuid())
+  materialId  String
+  quantity    Float
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  completedAt DateTime?
+
+  material Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
 }
 
 model ProductMaterial {

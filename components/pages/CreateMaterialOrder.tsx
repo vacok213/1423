@@ -1,37 +1,34 @@
 "use client";
 
 import { useActionState, useEffect } from "react";
+import { createMaterialOrder } from "@/actions/materialOrder";
 import { Button } from "@heroui/button";
 import { Card, CardBody } from "@heroui/card";
 import { Input } from "@heroui/input";
+import { TMaterialOrder } from "@/types/materialOrder";
 import { TAction } from "@/types/actions";
 import { redirect } from "next/navigation";
 import { Form } from "@heroui/form";
-import { TProductMaterial } from "@/types/productMaterial";
-import { createProductMaterial } from "@/actions/productMaterial";
-import { TProduct } from "@/types/product";
-import { TMaterial } from "@/types/material";
 import { Select, SelectItem } from "@heroui/select";
+import { TMaterial } from "@/types/material";
 
-const initialState: TAction<TProductMaterial> = {};
+const initialState: TAction<TMaterialOrder> = {};
 
-type CreateProductMaterialProps = {
-  products: TProduct[];
+type CreateMaterialOrderProps = {
   materials: TMaterial[];
 };
 
-export default function CreateProductMaterial({
-  products,
+export default function CreateMaterialOrder({
   materials,
-}: CreateProductMaterialProps) {
+}: CreateMaterialOrderProps) {
   const [state, formAction, pending] = useActionState(
-    createProductMaterial,
+    createMaterialOrder,
     initialState,
   );
 
   useEffect(() => {
     if (state.data && !state.message && !state.validationErrors) {
-      redirect("/product-materials");
+      redirect("/material-orders");
     }
   }, [state]);
 
@@ -40,21 +37,9 @@ export default function CreateProductMaterial({
       <CardBody>
         <Form action={formAction}>
           <Select
-            errorMessage={state.validationErrors?.productId}
-            isInvalid={!!state.validationErrors?.productId}
-            name="productId"
-            label="Продукт"
-            items={products}
-          >
-            {(product) => (
-              <SelectItem key={product.id} id={product.id}>
-                {product.name}
-              </SelectItem>
-            )}
-          </Select>
-          <Select
             errorMessage={state.validationErrors?.materialId}
             isInvalid={!!state.validationErrors?.materialId}
+            isDisabled={pending}
             name="materialId"
             label="Материал"
             items={materials}
@@ -72,6 +57,14 @@ export default function CreateProductMaterial({
             name="quantity"
             label="Количество"
             type="number"
+          />
+          <Input
+            errorMessage={state.validationErrors?.completedAt}
+            isInvalid={!!state.validationErrors?.completedAt}
+            isDisabled={pending}
+            name="completedAt"
+            label="Дата завершения"
+            type="date"
           />
           <Button isLoading={pending} color="primary" type="submit">
             Создать

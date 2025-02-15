@@ -1,3 +1,4 @@
+import { TMaterialOrder } from "./materialOrder";
 import { TProductMaterial } from "./productMaterial";
 
 export type TMaterial = {
@@ -5,7 +6,9 @@ export type TMaterial = {
   name: string;
   cost: number;
   unit: string;
+  quantityInStock: number;
   createdAt: Date;
   updatedAt: Date;
   products?: TProductMaterial[];
+  materialOrders?: TMaterialOrder[];
 };

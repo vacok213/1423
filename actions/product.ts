@@ -5,6 +5,8 @@ import { TAction } from "@/types/actions";
 import { prisma } from "@/utils/prisma";
 import { productSchema } from "@/schemas/product";
 import { ValidationErrors } from "@react-types/shared";
+import { TMaterial } from "@/types/material";
+import { TInsufficientMaterials } from "@/types/insufficientMaterial";
 
 export async function getProduct(id: string): Promise<TAction<TProduct>> {
   try {
@@ -16,6 +18,61 @@ export async function getProduct(id: string): Promise<TAction<TProduct>> {
 
     return {
       data: product,
+    };
+  } catch (error) {
+    return {
+      message:
+        error instanceof Error ? error.message : "An unknown error occurred",
+    };
+  }
+}
+
+export async function getRequiredMaterialsForProduction(
+  productId: string,
+  quantity: number,
+): Promise<
+  TAction<{
+    insufficientMaterials: TInsufficientMaterials[];
+  }>
+> {
+  try {
+    const productWithMaterials = await prisma.product.findUnique({
+      where: { id: productId },
+      include: {
+        materials: {
+          include: {
+            material: true,
+          },
+        },
+      },
+    });
+
+    if (!productWithMaterials) {
+      return {
+        message: "Product not found",
+      };
+    }
+
+    const insufficientMaterials: {
+      material: TMaterial;
+      required: number;
+    }[] = [];
+
+    for (const pm of productWithMaterials.materials) {
+      const requiredQuantity = pm.quantity * quantity;
+
+      if (requiredQuantity > pm.material.quantityInStock) {
+        insufficientMaterials.push({
+          material: pm.material,
+          required: requiredQuantity,
+        });
+      }
+    }
+
+    return {
+      data: {
+        insufficientMaterials,
+      },
     };
   } catch (error) {
     return {

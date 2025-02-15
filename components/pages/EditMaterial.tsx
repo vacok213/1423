@@ -16,7 +16,7 @@ type TEditMaterialProps = {
 
 const initialState: TAction<TMaterial> = {};
 
-export default function EditProduct({ material }: TEditMaterialProps) {
+export default function EditMaterial({ material }: TEditMaterialProps) {
   const [state, formAction, pending] = useActionState(
     updateMaterial.bind(null, material.id),
     initialState,
@@ -60,6 +60,15 @@ export default function EditProduct({ material }: TEditMaterialProps) {
                 <span className="text-default-400 text-small">₽</span>
               </div>
             }
+            type="number"
+          />
+          <Input
+            defaultValue={material.quantityInStock.toString()}
+            errorMessage={state.validationErrors?.quantityInStock}
+            isInvalid={!!state.validationErrors?.quantityInStock}
+            isDisabled={pending}
+            name="quantityInStock"
+            label="Количество на складе"
             type="number"
           />
           <Button isLoading={pending} color="primary" type="submit">

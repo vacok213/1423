@@ -36,6 +36,14 @@ export default function Dashboard({ children }: TDashboardProps) {
       isDisabled: !isAdmin,
     },
     {
+      key: "/material-orders",
+      id: "/material-orders",
+      title: "Заказы материалов",
+      href: "/material-orders",
+      as: Link,
+      isDisabled: !isAdmin && !isManager,
+    },
+    {
       key: "/product-materials",
       id: "/product-materials",
       title: "Состав продукта",

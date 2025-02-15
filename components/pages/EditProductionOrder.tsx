@@ -47,12 +47,13 @@ export default function EditProductionOrder({
             isInvalid={!!state.validationErrors?.productId}
             name="productId"
             label="Продукт"
+            items={products}
           >
-            {products.map((product) => (
+            {(product) => (
               <SelectItem key={product.id} id={product.id}>
                 {product.name}
               </SelectItem>
-            ))}
+            )}
           </Select>
           <Input
             defaultValue={productionOrder.quantity.toString()}
@@ -69,12 +70,13 @@ export default function EditProductionOrder({
             isInvalid={!!state.validationErrors?.statusId}
             name="statusId"
             label="Статус"
+            items={statuses}
           >
-            {statuses.map((status) => (
+            {(status) => (
               <SelectItem key={status.id} id={status.id}>
                 {status.name}
               </SelectItem>
-            ))}
+            )}
           </Select>
           <Button isLoading={pending} color="primary" type="submit">
             Обновить
