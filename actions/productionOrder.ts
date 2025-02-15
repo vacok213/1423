@@ -225,3 +225,28 @@ export async function deleteProductionOrder(
     };
   }
 }
+
+export async function getProductionOrdersCountByMonth(
+  year: number,
+  month: number,
+): Promise<TAction<number>> {
+  try {
+    const count = await prisma.productionOrder.count({
+      where: {
+        createdAt: {
+          gte: new Date(year, month - 1, 1),
+          lt: new Date(year, month, 1),
+        },
+      },
+    });
+
+    return {
+      data: count,
+    };
+  } catch (error) {
+    return {
+      message:
+        error instanceof Error ? error.message : "An unknown error occurred",
+    };
+  }
+}

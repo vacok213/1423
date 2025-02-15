@@ -1,6 +1,7 @@
 import { getProductionOrders } from "@/actions/productionOrder";
 import { getProducts } from "@/actions/product";
 import { getStatuses } from "@/actions/status";
+import { getProductionOrdersCountByMonth } from "@/actions/productionOrder";
 import { auth } from "@/auth";
 import ProductionOrders from "@/components/pages/ProductionOrders";
 import { notFound, redirect } from "next/navigation";
@@ -35,17 +36,33 @@ export default async function ProductionOrdersPage({
   const parsedLimit = Number(limit);
   const pageToSkip = (parsedPage - 1) * parsedLimit;
 
-  const [productionOrdersResponse, productsResponse, statusesResponse] =
-    await Promise.all([
-      getProductionOrders(parsedLimit, pageToSkip, productId, statusId),
-      getProducts(),
-      getStatuses(),
-    ]);
+  const date = new Date();
+  const currentMonth = date.getMonth() + 1;
+  const currentYear = date.getFullYear();
+  const previousMonth = currentMonth - 1;
+
+  const [
+    productionOrdersResponse,
+    productsResponse,
+    statusesResponse,
+    currentMonthCountResponse,
+    previousMonthCountResponse,
+  ] = await Promise.all([
+    getProductionOrders(parsedLimit, pageToSkip, productId, statusId),
+    getProducts(),
+    getStatuses(),
+    getProductionOrdersCountByMonth(currentYear, currentMonth),
+    getProductionOrdersCountByMonth(currentYear, previousMonth),
+  ]);
 
   const { data: productionOrdersData, message: productionOrdersMessage } =
     productionOrdersResponse;
   const { data: productsData, message: productsMessage } = productsResponse;
   const { data: statusesData, message: statusesMessage } = statusesResponse;
+  const { data: currentMonthCount, message: currentMonthCountMessage } =
+    currentMonthCountResponse;
+  const { data: previousMonthCount, message: previousMonthCountMessage } =
+    previousMonthCountResponse;
 
   if (
     !productionOrdersData ||
@@ -53,7 +70,11 @@ export default async function ProductionOrdersPage({
     !productsData ||
     productsMessage ||
     !statusesData ||
-    statusesMessage
+    statusesMessage ||
+    currentMonthCount == null ||
+    currentMonthCountMessage ||
+    previousMonthCount == null ||
+    previousMonthCountMessage
   ) {
     return notFound();
   }
@@ -69,6 +90,8 @@ export default async function ProductionOrdersPage({
       statuses={statuses}
       total={total}
       limit={parsedLimit}
+      currentMonthCount={currentMonthCount}
+      previousMonthCount={previousMonthCount}
     />
   );
 }

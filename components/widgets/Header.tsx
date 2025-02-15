@@ -23,9 +23,10 @@ import {
   useDisclosure,
 } from "@heroui/modal";
 import { Form } from "@heroui/form";
+import { Spinner } from "@heroui/spinner";
 
 export default function Header() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
   const {
     isOpen: isOpenSignOut,
@@ -55,7 +56,9 @@ export default function Header() {
           <NavbarItem>
             <ThemeSwitcher />
           </NavbarItem>
-          {session?.user ? (
+          {status === "loading" ? (
+            <Spinner />
+          ) : session?.user ? (
             <Dropdown backdrop="blur">
               <DropdownTrigger>
                 <Avatar
