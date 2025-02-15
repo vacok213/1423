@@ -43,7 +43,7 @@ export default function RootLayout({
         <Providers themeProps={{ attribute: "class", defaultTheme: "light" }}>
           <div className="space-y-6">
             <Header />
-            <main className="mx-auto w-full max-w-[1024px] px-6 py-4">
+            <main className="mx-auto w-full max-w-[1024px] px-6 py-4 break-all">
               {children}
             </main>
           </div>

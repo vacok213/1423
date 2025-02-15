@@ -22,26 +22,9 @@ model User {
   updatedAt     DateTime  @updatedAt
   role          Role      @default(MANAGER)
 
-  accounts       Account[]
-  sessions       Session[]
-  comments       Comment[]       @relation("user")
-  writedComments Comment[]       @relation("writer")
-  Authenticator  Authenticator[]
-}
-
-model Comment {
-  id        String   @id @default(cuid())
-  value     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  parentId String?
-  parent   Comment?  @relation("userComment", fields: [parentId], references: [id], onDelete: Cascade)
-  childs   Comment[] @relation("userComment")
-  writerId String
-  writer   User      @relation("writer", fields: [writerId], references: [id], onDelete: Cascade)
-  userId   String
-  user     User      @relation("user", fields: [userId], references: [id], onDelete: Cascade)
+  accounts      Account[]
+  sessions      Session[]
+  Authenticator Authenticator[]
 }
 
 model Account {
@@ -146,5 +129,5 @@ model ProductionOrder {
   updatedAt DateTime @updatedAt
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  status  Status  @relation(fields: [statusId], references: [id])
+  status  Status  @relation(fields: [statusId], references: [id], onDelete: Cascade)
 }
