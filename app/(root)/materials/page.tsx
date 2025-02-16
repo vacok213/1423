@@ -14,12 +14,6 @@ export default async function ProductsPage({
     query?: string;
   }>;
 }) {
-  const session = await auth();
-
-  if (session?.user.role !== "ADMIN") {
-    redirect("/");
-  }
-
   const { page = "1", limit = "20", query = "" } = await searchParams;
 
   const parsedPage = Number(page);

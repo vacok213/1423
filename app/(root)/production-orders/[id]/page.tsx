@@ -39,7 +39,11 @@ export default async function ProductionOrderPage({
     <ProductionOrder
       productionOrder={productionOrder}
       costEstimateProduct={costEstimateProduct}
-      actions={<ProductionOrderActions productionOrder={productionOrder} />}
+      actions={
+        session.user.role === "ADMIN" && (
+          <ProductionOrderActions productionOrder={productionOrder} />
+        )
+      }
     />
   );
 }

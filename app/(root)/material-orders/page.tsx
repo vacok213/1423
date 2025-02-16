@@ -16,7 +16,10 @@ export default async function MaterialOrdersPage({
 }) {
   const session = await auth();
 
-  if (session?.user.role !== "ADMIN") {
+  const isAdmin = session?.user.role === "ADMIN";
+  const isManager = session?.user.role === "MANAGER";
+
+  if (!isAdmin && !isManager) {
     redirect("/");
   }
 

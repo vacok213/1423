@@ -12,10 +12,7 @@ export default async function EditProductionOrderPage({
 }) {
   const session = await auth();
 
-  const isAdmin = session?.user.role === "ADMIN";
-  const isManager = session?.user.role === "MANAGER";
-
-  if (!isAdmin && !isManager) {
+  if (session?.user.role !== "ADMIN") {
     redirect("/");
   }
 

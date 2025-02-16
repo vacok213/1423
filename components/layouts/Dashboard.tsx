@@ -16,7 +16,6 @@ export default function Dashboard({ children }: TDashboardProps) {
   const pathname = usePathname();
 
   const isAdmin = session?.user.role === "ADMIN";
-  const isManager = session?.user.role === "MANAGER";
 
   const tabs: Array<VariantProps<typeof Tab>> = [
     {
@@ -33,7 +32,6 @@ export default function Dashboard({ children }: TDashboardProps) {
       title: "Материалы",
       href: "/materials",
       as: Link,
-      isDisabled: !isAdmin,
     },
     {
       key: "/material-orders",
@@ -41,7 +39,6 @@ export default function Dashboard({ children }: TDashboardProps) {
       title: "Заказы материалов",
       href: "/material-orders",
       as: Link,
-      isDisabled: !isAdmin && !isManager,
     },
     {
       key: "/product-materials",
@@ -65,7 +62,6 @@ export default function Dashboard({ children }: TDashboardProps) {
       title: "Производственные заказы",
       href: "/production-orders",
       as: Link,
-      isDisabled: !isAdmin && !isManager,
     },
   ];
 

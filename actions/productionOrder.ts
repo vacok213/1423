@@ -107,9 +107,9 @@ export async function createProductionOrder(
 
 export async function updateProductionOrder(
   id: string,
-  state: TAction<TProductionOrder>,
+  state: TAction<[TInsufficientMaterials[], TProductionOrder?]>,
   formData: FormData,
-): Promise<TAction<TProductionOrder>> {
+): Promise<TAction<[TInsufficientMaterials[], TProductionOrder?]>> {
   try {
     const productId = formData.get("productId") as string;
     const quantity = parseFloat(formData.get("quantity") as string);
@@ -137,7 +137,28 @@ export async function updateProductionOrder(
 
     const validatedData = validationResult.data;
 
-    const product = await prisma.productionOrder.update({
+    const { data, message: materialsMessage } =
+      await getRequiredMaterialsForProduction(
+        validatedData.productId,
+        validatedData.quantity,
+      );
+
+    if (!data || materialsMessage) {
+      return {
+        message: materialsMessage,
+      };
+    }
+
+    const insufficientMaterials = data.insufficientMaterials;
+
+    if (insufficientMaterials.length > 0) {
+      return {
+        data: [insufficientMaterials],
+        message: "Not enough materials",
+      };
+    }
+
+    const productionOrder = await prisma.productionOrder.update({
       where: {
         id,
       },
@@ -149,7 +170,7 @@ export async function updateProductionOrder(
     });
 
     return {
-      data: product,
+      data: [insufficientMaterials, productionOrder],
     };
   } catch (error) {
     return {

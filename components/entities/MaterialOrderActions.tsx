@@ -6,12 +6,12 @@ import {
   DropdownMenu,
   DropdownItem,
 } from "@heroui/dropdown";
-import { TMaterialOrder } from "@/types/materialOrder"; // Импортируем тип для заказа на материал
+import { TMaterialOrder } from "@/types/materialOrder";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { Button } from "@heroui/button";
 import { TDropdownItem } from "@/types/dropdownItem";
 import { useActionState, useEffect } from "react";
-import { deleteMaterialOrder } from "@/actions/materialOrder"; // Импортируем функцию для удаления заказа на материал
+import { deleteMaterialOrder } from "@/actions/materialOrder";
 import { TAction } from "@/types/actions";
 import {
   Modal,

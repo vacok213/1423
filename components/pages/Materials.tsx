@@ -7,16 +7,21 @@ import Material from "../entities/Material";
 import MaterialActions from "../entities/MaterialActions";
 import { Card, CardBody } from "@heroui/card";
 import Search from "../widgets/Search";
+import { auth } from "@/auth";
 
 type TMaterialsProps = TPaginate & {
   materials: TMaterial[];
 };
 
-export default function Materials({
+export default async function Materials({
   materials,
   total,
   limit,
 }: TMaterialsProps) {
+  const session = await auth();
+
+  const isAdmin = session?.user.role === "ADMIN";
+
   return (
     <div className="space-y-4">
       <Card isBlurred className="sticky top-40 z-30">
@@ -26,16 +31,18 @@ export default function Materials({
           </div>
         </CardBody>
       </Card>
-      <div className="flex justify-end">
-        <Button color="primary" as={Link} href="/materials/create">
-          Создать
-        </Button>
-      </div>
+      {isAdmin && (
+        <div className="flex justify-end">
+          <Button color="primary" as={Link} href="/materials/create">
+            Создать
+          </Button>
+        </div>
+      )}
       {materials.map((material) => (
         <Material
           key={material.id}
           material={material}
-          actions={<MaterialActions material={material} />}
+          actions={isAdmin && <MaterialActions material={material} />}
         />
       ))}
       <Paginate total={total} limit={limit} />

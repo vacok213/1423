@@ -2,6 +2,8 @@ import { TMaterialOrder } from "@/types/materialOrder";
 import formatPrice from "@/utils/formatPrice";
 import { Card, CardBody } from "@heroui/card";
 import { Chip } from "@heroui/chip";
+import { formatDistance } from "date-fns";
+import { ru } from "date-fns/locale";
 
 type TMaterialOrderProps = {
   materialOrder: TMaterialOrder;
@@ -22,6 +24,19 @@ export default function MaterialOrder({
         <div className="flex justify-between gap-4">
           <div className="space-y-1">
             <div className="flex gap-2 flex-wrap items-center">
+              {materialOrder.completedAt && (
+                <Chip>
+                  Доставлено:{" "}
+                  {formatDistance(
+                    new Date(materialOrder.completedAt),
+                    new Date(),
+                    {
+                      locale: ru,
+                      addSuffix: true,
+                    },
+                  )}
+                </Chip>
+              )}
               <Chip color="primary">
                 Количество:{" "}
                 <span className="font-bold">{materialOrder.quantity}</span>
